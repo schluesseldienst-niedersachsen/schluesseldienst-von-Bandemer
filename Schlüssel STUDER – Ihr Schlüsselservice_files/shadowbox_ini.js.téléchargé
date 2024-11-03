@@ -1,0 +1,13 @@
+$(document).ready(function() {
+	var options = {
+	  handleOversize: 'resize'
+	  ,animate: true
+	  ,displayNav: true
+	  ,overlayOpacity: 0.82
+	  ,handleUnsupported: 'remove'
+	  ,initialHeight:800
+	  ,initialWidth: 700
+	,continuous: true 
+	};
+	Shadowbox.init(options);
+});

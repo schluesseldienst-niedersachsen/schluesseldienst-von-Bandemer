@@ -1,0 +1,98 @@
+/**
+Basis bietet die Webseite http://responsivenavigation.net/
+Bzw. genauer das "Multi-Toggle Menu" http://responsivenavigation.net/examples/multi-toggle/
+
+Angepasst durch Brandes Webdesign fuer Redaxo Version 4.5.1 am 25.01.2014
+
+Nachfolgende Redaxo-Kern-Datei muss dazu angepaßt werden: class.rex_navigation.inc.php
+
+Dort die function _getNavigation() suchen:
+Nach dieser Codezeile:
+        } else {
+          $li["class"][] = 'rex-normal';
+        }
+Diese hier ergaenzen:
+		// Prueft ob es Unterkategorien gibt !!!
+        if( $nav->getChildren() ) 
+		{
+			$li["class"][] = 'has-submenu';
+        }
+*******************************************************************************/
+
+var jQuery_redaxo_responsive_menu = jQuery;
+	
+var var_nav_responsive_active = false;  
+
+jQuery_redaxo_responsive_menu(document).ready( function() 
+{
+//	jQuery_redaxo_responsive_menu('body').addClass('js');
+	var var_menu = jQuery_redaxo_responsive_menu('#navigation');
+	var var_menu_link = jQuery_redaxo_responsive_menu('#navigation a');
+	var var_navigation_button = jQuery_redaxo_responsive_menu('#navigation_button');
+
+	// Beim Klick auf #navigation_button
+	var_navigation_button.click(function(e) {
+		// Die Menuepunkte mit einer Unternavigation entsprechend kennzeichnen
+		//jQuery_redaxo_responsive_menu("#navigation li").has("ul").addClass('has-submenu').css("background-color","yellow");
+		jQuery_redaxo_responsive_menu("#navigation li").has("ul").addClass('has-submenu');
+
+		// Wenn die Navigation nicht im oberen Teil der Webseite platziert ist, muss sie fuers responsive dorthin verschoben werden !!!
+		if(var_nav_responsive_active)
+		{
+			// Nach dem responsive Menue schliessen, die Navigation wieder an den Ursprung zurueck verschieben
+			jQuery_redaxo_responsive_menu("#navigation").detach().appendTo('#navigation_not_responsive');
+			var_nav_responsive_active = false;
+		}
+		else
+		{
+			// Die Navigation ganz nach oben verschieben
+			jQuery_redaxo_responsive_menu("#navigation").detach().appendTo('#navigation_if_responsive');
+			var_nav_responsive_active = true;
+		}
+
+		e.preventDefault();
+		var_navigation_button.toggleClass('active');
+		var_menu.toggleClass('active');
+	});
+
+	// Beim Klick auf einen Navigationspunkt
+	var_menu_link.click(function(e) {
+		var page = jQuery_redaxo_responsive_menu('#page');
+		var width = page.innerWidth();
+		if (width <= 768)
+		{
+			var var_this = jQuery_redaxo_responsive_menu(this);
+			//var_this.parent().css("background-color","red");
+			if( var_this.parent().has("ul").length )
+			{
+				// Die Unternavigation aufklappen
+				var_this.toggleClass('active').next('ul').toggleClass('active');
+				e.preventDefault(); // Dem Link NICHT folgen
+				return false;
+			}
+			// else { } // Dem Link ganz normal folgen
+		} 
+	});		
+});
+
+
+jQuery_redaxo_responsive_menu(window).resize(function() {
+	var var_menu = jQuery_redaxo_responsive_menu('#navigation');
+	// var var_menu_link = jQuery_redaxo_responsive_menu('#navigation a');
+	var var_navigation_button = jQuery_redaxo_responsive_menu('#navigation_button');
+
+	var page = jQuery_redaxo_responsive_menu('#page');
+	var width = page.innerWidth();
+
+	if (var_nav_responsive_active && width <= 768)
+	{
+		// die Navigation wieder an den Ursprung zurueck verschieben
+		jQuery_redaxo_responsive_menu("#navigation").detach().appendTo('#navigation_not_responsive');
+		var_nav_responsive_active = false;
+
+		// den Ursprung wieder herstellen, so dass der Menu-Button erneut geklickt werden kann
+		var_menu.removeClass('active');
+		var_navigation_button.removeClass('active');
+	}
+});
+
